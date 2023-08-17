@@ -1,15 +1,21 @@
 import { useState } from 'react';
 
-const initialItems = [
-  { id: 1, description: "Passports", quantity: 2, packed: true },
-  { id: 2, description: "Socks", quantity: 12, packed: false },
-];
+// const initialItems = [
+//   { id: 1, description: "Passports", quantity: 2, packed: true },
+//   { id: 2, description: "Socks", quantity: 12, packed: false },
+// ];
 
 export default function App() {
+  let [items, setItems] = useState([]);
+
+  function handleItems(item) {
+    setItems(items => [...items, item])
+  }
+
   return <div className="app">
     <Logo />
-    <Form />
-    <PackingList />
+    <Form onAddItem={handleItems} />
+    <PackingList items={items} />
     <Stats />
   </div>
 }
@@ -18,9 +24,11 @@ function Logo() {
   return <h1>🏖️ Far Away 💼</h1>
 }
 
-function Form() {
+function Form({ onAddItem }) {
   let [quantity, setQuantity] = useState(1);
   let [description, setDescription] = useState("");
+
+
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -33,6 +41,8 @@ function Form() {
       packed: false,
       id: Date.now()
     };
+
+    onAddItem(newItem);
 
     setQuantity(1)
     setDescription("");
@@ -65,10 +75,10 @@ function Form() {
   )
 }
 
-function PackingList() {
+function PackingList({ items }) {
   return <div className="list">
     <ul>
-      {initialItems.map((item) => (<Item item={item} key={item.id} />))}
+      {items.map((item) => (<Item item={item} key={item.id} />))}
     </ul>
   </div>
 }
