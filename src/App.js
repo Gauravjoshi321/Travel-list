@@ -1,21 +1,29 @@
 import { useState } from 'react';
 
-// const initialItems = [
-//   { id: 1, description: "Passports", quantity: 2, packed: true },
-//   { id: 2, description: "Socks", quantity: 12, packed: false },
-// ];
-
 export default function App() {
   let [items, setItems] = useState([]);
 
-  function handleItems(item) {
+  function handleAddItems(item) {
     setItems(items => [...items, item])
+  }
+
+  function handleDeleteItems(id) {
+    setItems(items => items.filter(item => item.id !== id));
+  }
+
+  function handleToggleCheckBox(id) {
+    setItems(items => items.map(item => item.id === id
+      ? { ...item, packed: !item.packed } : item));
   }
 
   return <div className="app">
     <Logo />
-    <Form onAddItem={handleItems} />
-    <PackingList items={items} />
+    <Form onAddItem={handleAddItems} />
+    <PackingList
+      items={items}
+      onDeleteItems={handleDeleteItems}
+      onToggleCheckBox={handleToggleCheckBox}
+    />
     <Stats />
   </div>
 }
@@ -27,7 +35,6 @@ function Logo() {
 function Form({ onAddItem }) {
   let [quantity, setQuantity] = useState(1);
   let [description, setDescription] = useState("");
-
 
 
   function handleSubmit(e) {
@@ -75,21 +82,30 @@ function Form({ onAddItem }) {
   )
 }
 
-function PackingList({ items }) {
+function PackingList({ items, onDeleteItems, onToggleCheckBox }) {
   return <div className="list">
     <ul>
-      {items.map((item) => (<Item item={item} key={item.id} />))}
+      {items.map((item) => (<Item
+        item={item}
+        key={item.id}
+        onDeleteItems={onDeleteItems}
+        onToggleCheckBox={onToggleCheckBox}
+      />))}
     </ul>
   </div>
 }
 
-function Item({ item }) {
+function Item({ item, onDeleteItems, onToggleCheckBox }) {
   return (
     <li>
+      <input
+        type='checkbox'
+        value={item.packed}
+        onClick={() => { onToggleCheckBox(item.id) }} />
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
         {item.quantity} {item.description}
       </span>
-      <button>❌</button>
+      <button onClick={() => onDeleteItems(item.id)}>❌</button>
     </li>
   )
 }
